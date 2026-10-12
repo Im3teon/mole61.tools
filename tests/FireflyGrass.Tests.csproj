@@ -1,0 +1,20 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>FireflyGrass.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <OutputPath>bin\</OutputPath>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System"/><Reference Include="System.Core"/><Reference Include="System.Drawing"/>
+    <Compile Include="FireflyGrassTests.cs"/>
+    <Compile Include="..\撈金魚\Analyzer\AnalyzeFireflyGrass.cs"/>
+    <Compile Include="..\撈金魚\ActionPerform\FireflyGrassRoute.cs"/>
+    <EmbeddedResource Include="..\撈金魚\Analyzer\FireflyGrassTemplates\*.png">
+      <LogicalName>FireflyGrass.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
+</Project>

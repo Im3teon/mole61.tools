@@ -1,0 +1,150 @@
+<Window x:Class="撈金魚.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="mole61.tools · Im3teon" Width="940" Height="760" MinWidth="640" MinHeight="560"
+        Background="#F3F6FA" Foreground="#203247" FontFamily="Microsoft JhengHei UI, Segoe UI"
+        FontSize="14" WindowStartupLocation="CenterScreen" UseLayoutRounding="True"
+        Closing="ClosingAction" FocusManager.FocusedElement="{Binding ElementName=input}">
+    <Window.Resources>
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#203247"/>
+            <Setter Property="BorderBrush" Value="#DCE4EE"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Margin" Value="0,0,10,10"/>
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="MinHeight" Value="48"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="ToolTipService.InitialShowDelay" Value="250"/>
+            <Setter Property="ToolTipService.ShowDuration" Value="30000"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="#EAF5F5"/><Setter TargetName="Surface" Property="BorderBrush" Value="#298B8B"/></Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="#167B80"/><Setter TargetName="Surface" Property="BorderThickness" Value="2"/></Trigger>
+                            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Background" Value="#CEE8E8"/></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Surface" Property="Opacity" Value="0.45"/></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="White"/><Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="22"/><Setter Property="Margin" Value="0,0,0,16"/>
+            <Setter Property="BorderBrush" Value="#E3EAF2"/><Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="17"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,0,0,14"/>
+        </Style>
+    </Window.Resources>
+    <DockPanel Margin="28,24">
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="mole61.tools" FontSize="30" FontWeight="Bold"/>
+                <TextBlock Text="Im3teon 維護版  /  摩爾莊園日常工具" Foreground="#607389" Margin="0,5,0,0"/>
+            </StackPanel>
+            <Border Grid.Column="1" Background="#DFF1EE" CornerRadius="12" Padding="14,8" VerticalAlignment="Center">
+                <TextBlock Text="莊園工具箱" Foreground="#176D68" FontWeight="SemiBold"/>
+            </Border>
+        </Grid>
+        <Border DockPanel.Dock="Bottom" Padding="4,12,4,0">
+            <TextBlock Foreground="#607389" FontSize="12" TextWrapping="Wrap" Text="滑鼠停留在按鈕上可查看操作說明。  Ctrl + Backspace：結束程式與執行中的操作。"/>
+        </Border>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="01  設定執行參數" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="輸入次數或功能指定的數字組合，再選擇下方功能。" Foreground="#607389" Margin="0,0,0,12" TextWrapping="Wrap"/>
+                        <TextBox x:Name="input" FontSize="26" Padding="12,8" Background="#F8FAFC" BorderBrush="#B7C9D8" BorderThickness="1"
+                                 VerticalContentAlignment="Center" AutomationProperties.Name="執行次數或參數" AutomationProperties.HelpText="輸入次數或功能指定的數字組合"/>
+                        <TextBlock Text="撈金魚、營養液、元素騎士、龍之幻境與毛毛樹：留空可沿用上次參數。" Foreground="#607389" FontSize="12" Margin="0,10,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+<Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="02  休閒與日常" Style="{StaticResource SectionTitle}"/><WrapPanel>
+<Button Content="摩界之門採集" Click="ForestHarvestButton" Style="{StaticResource ActionButton}"
+        ToolTip="自動前往黑森林的摩界之門，依序採集毛毛豆種子、拉姆菌、捕蠅草種子。留空採到各項上限；輸入數字則各採指定回數。" />
+<Button Content="採收螢火草" Click="FireflyGrassButton" Style="{StaticResource ActionButton}"
+        AutomationProperties.HelpText="自動前往漿果叢林的彩虹瀑布採收螢火草。留空採到每日上限，或輸入採收回數。"
+        ToolTip="自動前往漿果叢林 → 彩虹瀑布，採收左側螢火草。&#10;留空：採到每日上限；輸入 1～999：指定採收回數。&#10;每次辨識到獎勵提示才算一回；遇到每日上限會提早停止。&#10;可按計數視窗的「停止」中止，完成後停留在彩虹瀑布。"/>
+<Button Click="PlayFishButton" AutomationProperties.HelpText="撈金魚，撈你輸入的次數，在主畫面使用即可" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+            撈金魚
+            <Button.ToolTip><ToolTip><TextBlock>
+                        只計算成功次數<LineBreak />
+                        建議要撈之前重開遊戲，讓遊戲不會卡，會比較快<LineBreak /><LineBreak />
+                        在任何地方都能使用，只要滑鼠能點到右上角的莊園回憶錄
+                    </TextBlock></ToolTip></Button.ToolTip></Button>
+<Button Content="代撈金魚" ToolTip="11~15分鐘自動關掉" Click="HelpPlayFishButton" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
+<Button Content="毛毛樹" ToolTip="右鍵設定更多" Click="MoMoTreeButton" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><Button.ContextMenu><ContextMenu><MenuItem Header="設定" IsCheckable="False" Click="MoMoTreeSettingButton" /></ContextMenu></Button.ContextMenu></Button>
+<Button Click="BuyFatNutrientButton" AutomationProperties.HelpText="買99乘以你輸入次數的營養液，在肥肥館可直接使用，不用打開商店" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+            買99營養液
+            <Button.ToolTip><ToolTip><TextBlock>
+                        因為技術限制，使用時摩爾莊園會跑到最上層<LineBreak /><LineBreak />
+                        在肥肥館主畫面使用即可
+                    </TextBlock></ToolTip></Button.ToolTip></Button>
+<Button Content="家園牧場商店" Click="HomeFarmBuyButton" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><Button.ToolTip><ToolTip><TextBlock>
+                        請打開家園或牧場商店的正確頁面<LineBreak />
+                        輸入[次數][位置]<LineBreak />
+                        例如123就會購買99*12個第3格的東西<LineBreak />
+                        左上為1，先左右後上下。
+                    </TextBlock></ToolTip></Button.ToolTip></Button>
+<Button Content="添加飼料" Click="FeedButton" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><Button.ToolTip><ToolTip><TextBlock>
+                        請到你要的人家裡打開飼料槽<LineBreak />
+                        輸入[次數][飼料位置(豎)][飼料位置(橫)]<LineBreak />
+                        例如1212就會放入999*12個魚餌
+                    </TextBlock></ToolTip></Button.ToolTip></Button>
+</WrapPanel></StackPanel></Border>
+<Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="03  戰鬥與挑戰" Style="{StaticResource SectionTitle}"/><WrapPanel>
+<Button Click="ElementKnightButton" AutomationProperties.HelpText="自動元素騎士戰鬥你輸入的次數，要打開你想打的副本才能使用" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+            元素騎士戰鬥
+            <Button.ToolTip><ToolTip><TextBlock>
+                        獲勝戰敗都算一次<LineBreak /><LineBreak />
+                        需要開啟想要打的副本
+                    </TextBlock></ToolTip></Button.ToolTip></Button>
+<Button Content="元素騎士套組" Click="ElementKnightKitButton" AutomationProperties.HelpText="作者自用，會使用兩罐體力藥劑，分別挑戰無盡深淵、莎士摩亞、以及扣扣" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><Button.ToolTip><ToolTip><TextBlock>
+                        1.無盡深淵75次<LineBreak />
+                        2.莎士摩亞10次<LineBreak />
+                        3.回復體力<LineBreak />
+                        4.莎士摩亞24次<LineBreak />
+                        5.回復體力<LineBreak />
+                        6.莎士摩亞7次<LineBreak />
+                        7.決戰扣扣18次<LineBreak /><LineBreak />
+                        在任何地方都能使用，只要滑鼠能點到右下角的地盤
+                    </TextBlock></ToolTip></Button.ToolTip></Button>
+<Button Content="龍之幻境" Click="DragonButton" AutomationProperties.HelpText="自動挑戰指定次數的龍之幻境，輸入方法為挑戰次數、頁數、編號，數字要直接連在一起，編號排序方法為由左到右，由上至下。在能點開主世界地圖的地方即可使用本按鈕。" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><Button.ToolTip><ToolTip><TextBlock>
+                        次數頁數位置<LineBreak />
+                        左上為1<LineBreak />
+                        右上為2<LineBreak />
+                        中間為3<LineBreak />
+                        左下為4<LineBreak />
+                        右下為5<LineBreak />
+                        舉例：2011就是打比格獸20次<LineBreak />
+                        2011的意思是，20次，第一頁，左上<LineBreak />
+                        只計算勝利<LineBreak />
+                        在大部分的地方都能使用，只要點開地圖是主世界地圖就好<LineBreak />
+                        例如家園就能使用
+                    </TextBlock></ToolTip></Button.ToolTip><Button.ContextMenu><ContextMenu><MenuItem Header="設定" IsCheckable="False" Click="DragonSettingButton" /></ContextMenu></Button.ContextMenu></Button>
+<Button Content="保衛月餅島" ToolTip="自己想辦法飛到月餅島，然後按下去" Click="DefenceMoonCake" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
+</WrapPanel></StackPanel></Border>
+<Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="04  工具與設定" Style="{StaticResource SectionTitle}"/><WrapPanel>
+<Button Content="選擇應用程式" Click="SelectProcessButton" ToolTip="選擇要操作的遊戲視窗，確認後立即生效" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"></Button>
+<Button Content="更新設定" Click="UpdateSettingButton" ToolTip="自動更新設定、目前版本、手動檢查更新" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
+<Button Click="CaptureMousePos" Content="抓座標" ToolTip="查看滑鼠點擊座標" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" />
+<Button Content="狼狼專屬" Click="LinWeiAction" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><Button.ToolTip><ToolTip><TextBlock>
+                        專為狼狼製作的功能<LineBreak />
+                        自動抓"帳號密碼.txt"內的帳號同時多開<LineBreak />
+                        每一行都打帳號:密碼<LineBreak />
+                        登入後自動靜音+牧場澆水<LineBreak />
+                        需要將 flash player 和文字檔都放在同一個資料夾內
+                    </TextBlock></ToolTip></Button.ToolTip></Button>
+</WrapPanel></StackPanel></Border><Expander Header="進階工具" Foreground="#607389" Margin="4,0,0,12"><StackPanel Margin="0,12,0,0"><TextBlock Text="作者測試功能，僅供開發除錯使用。" Margin="0,0,0,10"/><Button Content="test" Click="Button_Click" AutomationProperties.HelpText="作者測試用，別點" Style="{StaticResource ActionButton}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" /></StackPanel></Expander></StackPanel></ScrollViewer></DockPanel></Window>
+
+

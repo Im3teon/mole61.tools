@@ -1,0 +1,307 @@
+﻿using Gma.System.MouseKeyHook;
+using Hazdryx.Drawing;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Forms;
+using WindowsInput;
+using WindowsInput.Native;
+using 撈金魚.ActionPerform;
+using 撈金魚.ActionPerform.Common;
+using 撈金魚.ActionPerform.ElementKnight;
+using 撈金魚.ActionPerform.FatHouse;
+using 撈金魚.Analyzer;
+using 撈金魚.FileManager;
+using 撈金魚.structures;
+using 撈金魚.ToolToProgram;
+using 撈金魚.Updater;
+using 撈金魚.UserInterface;
+using static 撈金魚.ActionPerform.ButtonPerformer;
+using static 撈金魚.ActionPerform.Common.MapMove;
+using Application = System.Windows.Application;
+using Point = System.Drawing.Point;
+
+namespace 撈金魚
+{
+    /// <summary>
+    /// MainWindow.xaml 的互動邏輯
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        private const string DEFAULT_PROCESS_NAME = "flashplayer";
+        readonly GetProgramWindow window;
+        private AllSettings user_settings = UserSettings.Load();
+        private readonly List<AccountDatum> account_data = AccountDataLoader.Load();
+        private readonly MoMoTreeSetting momo_tree;
+        private readonly UpdateSettingsWindow update_settings_window;
+        //started immediately so the network round-trip overlaps with window construction/layout instead of blocking either
+        private readonly Task<ManifestEntry> pending_update_check;
+
+        private void PlayFishButton(object sender, RoutedEventArgs _)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.fish), ActionKit.fish, false);
+        }
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            InitializeGlobalHook();
+            Loaded += MainWindow_Loaded;
+
+            window = new GetProgramWindow(string.IsNullOrEmpty(user_settings.ProcessName) ? DEFAULT_PROCESS_NAME : user_settings.ProcessName);
+            momo_tree = new MoMoTreeSetting(window, user_settings.Momo);
+            update_settings_window = new UpdateSettingsWindow(user_settings);
+            pending_update_check = user_settings.AutoUpdate ? Task.Run(() => UpdateManager.CheckForUpdate()) : null;
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (pending_update_check == null)
+                return;
+            ManifestEntry update = await pending_update_check;
+            if (update != null)
+                update_settings_window.NotifyUpdateAvailable(update);
+        }
+
+        private void ClosingAction(object sender, CancelEventArgs _)
+        {
+            //the default closing action may not actually stop the program
+            //Which only close the window and work in background until your threads are done.
+            UserSettings.Save(user_settings);
+            if (UpdateManager.HasPendingUpdate && (!UpdateManager.PendingUpdateIsAutomatic || user_settings.AutoUpdate))
+                UpdateManager.DownloadAndInstall(UpdateManager.PendingUpdateUrl);
+            Environment.Exit(0);
+        }
+
+        private void InitializeGlobalHook()
+        {
+            IKeyboardMouseEvents hook = Hook.GlobalEvents();
+            //hook.MouseUpExt += mouseUp;
+            hook.KeyUp += Exit;
+        }
+
+        private void Exit(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode.Equals(Keys.Back) && e.Modifiers == Keys.Control)
+                this.Close();
+        }
+
+        private void BuyFatNutrientButton(object sender, RoutedEventArgs _)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.buy_nutrient), ActionKit.buy_nutrient);
+        }
+
+        private void ElementKnightButton(object sender, RoutedEventArgs _)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.play_element_knight), ActionKit.play_element_knight);
+        }
+
+        private void ElementKnightKitButton(object sender, RoutedEventArgs _)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, 0, ActionKit.element_knight_kit);
+        }
+
+        private void DragonButton(object sender, RoutedEventArgs _)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.dragon), ActionKit.dragon);
+        }
+        private void MoMoTreeButton(object sender, RoutedEventArgs e)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.momo_tree), ActionKit.momo_tree, true, momo_tree.GetPara());
+        }
+
+        private void FireflyGrassButton(object sender, RoutedEventArgs e)
+        {
+            int times = 0;
+            if (!string.IsNullOrWhiteSpace(input.Text) &&
+                (!int.TryParse(input.Text.Trim(), out times) || times < 1 || times > 999))
+            {
+                UserInterface.Message.ShowMessageToUser("請輸入 1～999 回，或留空採收到每日上限。", "採收螢火草");
+                return;
+            }
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, times, ActionKit.firefly_grass, false);
+        }
+
+        private void ForestHarvestButton(object sender, RoutedEventArgs e)
+        {
+            int times = 0;
+            if (!string.IsNullOrWhiteSpace(input.Text) &&
+                (!int.TryParse(input.Text.Trim(), out times) || times < 1 || times > 999))
+            {
+                UserInterface.Message.ShowMessageToUser("請輸入 1～999 回（每項），或留空採到各項上限。", "摩界之門採集");
+                return;
+            }
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, times, ActionKit.forest_harvest, false);
+        }
+
+        private void MoMoTreeSettingButton(object sender, RoutedEventArgs e)
+        {
+            momo_tree.Show();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs _)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.test), ActionKit.test, false);
+            //testFun(window.Windows.Values.ToArray()[0]);
+
+        }
+
+        private void testFun(WindowPack.WindowSource window)
+        {
+            window.ReOpen();
+            //MapMove.MapMoveTo(new MapPlace(MapType.Black_Forest, (int)PlaceInBlackForest.VineForest), window);
+
+            Click.GoRestaurant(window);
+            Wait.WaitForPlaceChange(window, 5000);
+            MouseInput.MouseClickForMole(window, 39, 515);
+            //ScreenAction.GetContentShot(window).Save("test/shot.png");
+        }
+        private int GetLoopTimes(ActionKit action)
+        {
+            int times = GetInputTimes();
+            if (times == -2)
+                return times;
+            else if (times == -1)
+            {
+                return LoadCount(action);
+            }
+            else
+            {
+                return SaveCount(action, times);
+            }
+        }
+        
+        private int LoadCount(ActionKit action)
+        {
+            int times = action switch
+            {
+                ActionKit.fish => user_settings.Counts.GetFish,
+                ActionKit.play_element_knight => user_settings.Counts.ElementKnight,
+                ActionKit.buy_nutrient => user_settings.Counts.BuyFatNutrient,
+                ActionKit.dragon => user_settings.Counts.Dragon,
+                ActionKit.momo_tree => user_settings.Counts.MoMoTree,
+                _ => 0,
+            };
+            input.Text = Convert.ToString(times);
+            return times;
+        }
+
+        private int SaveCount(ActionKit action, int times)
+        {
+            switch (action)
+            {
+                case ActionKit.fish:
+                    user_settings.Counts.GetFish = times;
+                    break;
+                case ActionKit.play_element_knight:
+                    user_settings.Counts.ElementKnight = times;
+                    break;
+                case ActionKit.buy_nutrient:
+                    user_settings.Counts.BuyFatNutrient = times;
+                    break;
+                case ActionKit.dragon:
+                    user_settings.Counts.Dragon = times;
+                    break;
+                case ActionKit.momo_tree:
+                    user_settings.Counts.MoMoTree = times;
+                    break;
+            }
+            return times;
+        }
+
+        private int GetInputTimes()
+        {
+            if (input.Text.Length == 0)
+            {
+                return -1;
+            }
+            try
+            {
+                return Convert.ToInt32(input.Text);
+            }
+            catch (OverflowException)
+            {
+                UserInterface.Message.ShowMessageToUser("數字太大了哈囉", "錯誤");
+            }
+            catch (FormatException)
+            {
+                UserInterface.Message.ShowMessageToUser("這不是數字哈囉", "錯誤");
+            }
+            //this means invalid number
+            return -2;
+        }
+
+        private void HelpPlayFishButton(object sender, RoutedEventArgs e)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, 30, ActionKit.help_fish, false);
+        }
+
+        private void HomeFarmBuyButton(object sender, RoutedEventArgs e)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.home_farm_buy), ActionKit.home_farm_buy, false);
+        }
+
+        private void FeedButton(object sender, RoutedEventArgs e)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.feed), ActionKit.feed, false);
+        }
+        private void DragonSettingButton(object sender, RoutedEventArgs e)
+        {
+            UserInterface.Message.ShowMessageToUser("功能未實裝");
+        }
+
+        private void CaptureMousePos(object sender, RoutedEventArgs e)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, 1, ActionKit.capture_mouse_pos, false);
+        }
+
+        private void DefenceMoonCake(object sender, RoutedEventArgs e)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.Windows, GetLoopTimes(ActionKit.defence_moon_cake), ActionKit.defence_moon_cake);
+        }
+
+        private void LinWeiAction(object sender, RoutedEventArgs e)
+        {
+            window.UpdateRect();
+            ButtonPerformer.PerformButton(window.CreateNewWindows(account_data.Count), 1, ActionKit.lin_wei, false, account_data);
+        }
+
+        private void SelectProcessButton(object sender, RoutedEventArgs e)
+        {
+            ProcessSelectWindow select_window = new();
+            if (select_window.ShowDialog() == true)
+            {
+                //settings.json is only actually written in ClosingAction, matching other settings here
+                user_settings.ProcessName = select_window.SelectedProcessName;
+                window.SetProcessName(select_window.SelectedProcessName);
+                UserInterface.Message.ShowMessageToUser("已選擇");
+            }
+        }
+
+        private void UpdateSettingButton(object sender, RoutedEventArgs e)
+        {
+            update_settings_window.Show();
+            update_settings_window.Activate();
+        }
+    }
+}

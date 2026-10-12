@@ -1,0 +1,15 @@
+﻿<Window x:Class="撈金魚.UserInterface.MouseInputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:撈金魚.UserInterface"
+        mc:Ignorable="d"
+        Closing="ClosingAction"
+        Title="點擊畫面" Height="700" Width="960">
+    <Grid Height="560" VerticalAlignment="Bottom">
+        <local:ImageMonitor x:Name="ImgDisplay" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center"/>
+        <TextBox x:Name="InfoText" HorizontalAlignment="Center" Margin="0,-94,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="926" Height="59" FontSize="36"/>
+
+    </Grid>
+</Window>
